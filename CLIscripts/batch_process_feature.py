@@ -1,5 +1,4 @@
 # This file is designed to run by shell scripts to extracts all specified slides and ROIs 
-
 import numpy as np
 import os
 import glob
@@ -11,14 +10,14 @@ from typing import Union, Optional, Type, Tuple, List, Dict
 import sys
 from skimage.color import label2rgb
 import json
-import nrrd
+# import nrrd
 import pandas as pd
 import seaborn as sns
-# Project Root, used for searching packages and functions
-ROOT_DIR = '/project/DPDS/Xiao_lab/shared/deep_learning_SW_RR/cytof/image_cytof'
 
+# Project Root, used for searching packages and functions
+ROOT_DIR = '/project/Xie_Lab/zgu/xiao_multiplex/multiTAP/image_cytof'
 sys.path.append(ROOT_DIR)
-sys.path.append(os.path.join(ROOT_DIR, 'image_cytof'))
+
 from cytof.hyperion_preprocess import cytof_read_data_roi
 from cytof.utils import save_multi_channel_img, check_feature_distribution
 from cytof.classes import CytofCohort
@@ -51,25 +50,38 @@ class SetParameters():
         self.cell_radius     = cell_radius
         self.normalize_qs    = normalize_qs
 
-one_slide = 'BaselTMA_SP43_25'
-IMC_FOLDER = '/archive/DPDS/Xiao_lab/shared/shidan/hyperion/The Single-Cell Pathology Landscape of Breast Cancer/OMEandSingleCellMasks/OMEnMasks/ome/ome'
+##### generates a pandas df to save as cohorts#####
+# one_slide = 'BaselTMA_SP43_25'
+# IMC_FOLDER = '/archive/DPDS/Xiao_lab/shared/shidan/hyperion/The Single-Cell Pathology Landscape of Breast Cancer/OMEandSingleCellMasks/OMEnMasks/ome/ome'
+# cohort_file_list = []
+# roi_name = []
+# # find all samples with the above slide number
+# for file in glob.glob(os.path.join(IMC_FOLDER, f"{one_slide}*")):
+#   cohort_file_list.append(file)
+#   roi_name.append("_".join(file.split('_')[-6:-2]))
+# slides = [one_slide] * len(cohort_file_list)
+# fs_input = cohort_file_list.copy()
 
+# # during batch processing, CytofCohort always expect three inputs. 
+# # First input is for naming purposes (name of the slide of cohort)
+# # Second input is the varying ROI/TMA that you want to analyze together as one cohort
+# # Third input is the corresponding file path
+# # df is required to have three keys for downstream analysis: 'Slide', 'ROI', 'input file'
+# df_cohort_to_load = pd.DataFrame({"Slide": slides, "ROI": roi_name, "input file": fs_input}) 
+# df_cohort_to_load.to_csv('df_cohort_to_load.csv', index=False) #debug purposes
+####################################################
 
-cohort_file_list = []
-roi_name = []
+##### reading csv in manually#####
+# # still required to contain the three keys (see above section)
+filename = '/project/Xie_Lab/zgu/xiao_multiplex/breast_cancer_multiTAP_work/testing2.csv'
+df_cohort_to_load = pd.read_csv(filename)
+##################################
 
-# find all samples with the above slide number
-for file in glob.glob(os.path.join(IMC_FOLDER, f"{one_slide}*")):
-  cohort_file_list.append(file)
-  roi_name.append("_".join(file.split('_')[-6:-2]))
+print(f'{len(df_cohort_to_load)} instances identified for cohort processing')
 
-slides = [one_slide] * len(cohort_file_list)
-fs_input = cohort_file_list
-
-df_cohort_to_load = pd.DataFrame({"Slide": slides, "ROI": roi_name, "input file": fs_input}) 
-print('df cohort:', df_cohort_to_load)
-
-cytof_slide_cohort = CytofCohort(cytof_images=None, df_cohort=df_cohort_to_load)
+dir_out = '/project/Xie_Lab/zgu/xiao_multiplex/breast_cancer_multiTAP_work'
+# dir_out creates an output folder. set dir_out=None to disable.
+cytof_slide_cohort = CytofCohort(cytof_images=None, df_cohort=df_cohort_to_load, cohort_name='BaselTMA_testing_roi4', dir_out=dir_out)
 
 channel_dict = {
         'nuclei': ['DNA1-Ir191', 'DNA2-Ir193'],
@@ -78,15 +90,20 @@ channel_dict = {
     }
 
 params_cohort = {
-  'label_marker_file': "/archive/DPDS/Xiao_lab/shared/hudanyun_sheng/github/image_cytof_test_data/external_data/The Single-Cell Pathology Landscape of Breast Cancer/markers_labels.txt",
+  'label_marker_file': "/project/Xie_Lab/zgu/xiao_multiplex/breast_cancer_multiTAP_work/marker_labels.txt",
   'channels_remove': ['nan1-nan1', 'nan2-nan2', 'nan3-nan3', 'nan4-nan4', 'nan5-nan5'],
   'channels_dict': channel_dict,
   'use_membrane': True
 }
 
+# computes features individually for all ROI/TMA in the defined cohort
 cytof_slide_cohort.batch_process(params=params_cohort)
-cytof_slide_cohort.generate_summary()
 
-cytof_slide_cohort.save_cytof_cohort('SlideBaselTMA_SP43_25_final.pkl')
+# # scale feature across ROI images, if needed
+# cytof_slide_cohort.batch_process_feature()
+# cytof_slide_cohort.generate_summary()
 
-print('Program completed.')
+# save cohort
+save_path = cytof_slide_cohort.save_cytof_cohort()
+
+print(f'Program completed. Results saved to {save_path}')

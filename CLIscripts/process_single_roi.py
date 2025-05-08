@@ -82,7 +82,6 @@ def image_to_feature(cytof_img, params: SetParameters):
     # step 5) feature extractions
     cytof_img.extract_features(filename=cytof_img.filename)
     cytof_img.feature_quantile_normalization(qs=params.normalize_qs, vis_compare=False) 
-    cytof_img.calculate_quantiles(qs=params.normalize_qs) # calculates quantiles between each marker and cell
 
     return cytof_img 
 

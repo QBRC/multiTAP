@@ -1157,7 +1157,7 @@ def apply_threshold_to_column(column, threshold):
 class CytofCohort():
     def __init__(self, cytof_images: Optional[dict] = None, 
                  df_cohort: Optional[pd.DataFrame] = None, 
-                 dir_out: str = "./", 
+                 dir_out: Optional[str] = "./", 
                  cohort_name: str = "cohort1"):
         """
         cytof_images: 
@@ -1173,10 +1173,13 @@ class CytofCohort():
             "cell_ave_only": ["cell_ave"]
         }
         
-        self.name    = cohort_name
-        self.dir_out = os.path.join(dir_out, self.name)
-        if not os.path.exists(self.dir_out):
-            os.makedirs(self.dir_out)
+        self.name = cohort_name
+        print('dir_out:', dir_out, type(dir_out))
+        self.dir_out = os.path.join(dir_out, self.name) if isinstance(dir_out, str) else None 
+        if self.dir_out:
+            print('Output folder created:', self.dir_out)        
+            os.makedirs(self.dir_out, exist_ok=True)
+
     def __getitem__(self, key):
         'Extracts a particular cytof image from the cohort'
         return self.cytof_images[key]
@@ -1187,12 +1190,16 @@ class CytofCohort():
     def __repr__(self):
         return f"CytofCohort(name={self.name})"
     
-    def save_cytof_cohort(self, savename):
-        directory = os.path.dirname(savename)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        pkl.dump(self, open(savename, "wb"))
-    
+    def save_cytof_cohort(self):
+        if self.dir_out:
+            save_path = f'{os.path.join(self.dir_out, self.name)}.pkl'
+            pkl.dump(self, open(save_path, "wb"))
+
+            return save_path
+        else:
+            raise FileNotFoundError('self.dir_out not specified')
+
+
     def batch_process_feature(self):
         """
         Batch process: if the CytofCohort is initialized by a dictionary of CytofImages
@@ -1226,24 +1233,36 @@ class CytofCohort():
     def batch_process(self, params: Dict):
         sys.path.append("../CLIscripts")
         from process_single_roi import process_single, SetParameters
+        
+        success_rows = []
         for i, (slide, roi, fname) in self.df_cohort.iterrows():
             paramsi = SetParameters(filename=fname,
-                        outdir=self.dir_out,
-                        label_marker_file=params.get('label_marker_file', None),
-                        slide=slide,
-                        roi=roi,
-                        quality_control_thres=params.get("quality_control_thres", 50),
-                        channels_remove=params.get("channels_remove", None),
-                        channels_dict=params.get("channels_dict", None),
-                        use_membrane=params.get("use_membrane",True),
-                        cell_radius=params.get("cell_radius", 5),
-                        normalize_qs=params.get("normalize_qs", 75),
-                        iltype=params.get('iltype', None))
+                outdir=self.dir_out,
+                label_marker_file=params.get('label_marker_file', None),
+                slide=slide,
+                roi=roi,
+                quality_control_thres=params.get("quality_control_thres", 50),
+                channels_remove=params.get("channels_remove", None),
+                channels_dict=params.get("channels_dict", None),
+                use_membrane=params.get("use_membrane",True),
+                cell_radius=params.get("cell_radius", 5),
+                normalize_qs=params.get("normalize_qs", 75),
+                iltype=params.get('iltype', None))
 
-            cytof_img = process_single(paramsi, downstream_analysis=False, verbose=False)
-            self.cytof_images[f"{slide}_{roi}"] = cytof_img
+            try:
+                cytof_img = process_single(paramsi, downstream_analysis=False, verbose=False)
+                self.cytof_images[f"{slide}_{roi}"] = cytof_img
+                
+                # image successfully processed, record index
+                success_rows.append(i)
             
-        self.batch_process_feature()
+            except Exception as e:
+                print(f"Skipping {slide}_{roi} due to error: {e}")
+                continue
+        
+        # update df_cohort to contain only successfully calculated rows
+        self.df_cohort = self.df_cohort.loc[success_rows].reset_index(drop=True)
+            
 
     def get_feature(self, 
                     normq: int = 75, 

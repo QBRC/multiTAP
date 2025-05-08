@@ -163,14 +163,16 @@ Parameter options summary:
    --cell_radius | assumed radius for cells to use in cell segmentation | 5
    --normalize_qs |  a list percentile to be used in normalization | [75, 99]
 
-## Multiple ROI
-If you know there exist multiple ROIs within the same slide, as in the case of this breast cancer dataset, you can batch process all ROIs at once. Checkout `./CLIscipts/batch_process_feature.py` for implementation details.
+## Multiple ROI/TMA
+If you know there exist multiple ROI within the same slide, or in the case of this breast cancer dataset where TMAs can be grouped by grade, clinical type, pTNM, you can batch process all of these ROI/TMAs at once. Checkout `./CLIscipts/batch_process_feature.py` for implementation details.
 
 To run batch process, you may call the following scripts:
 ```
 sh batch_feature_extract.sh
 ```
 Note: The IMC data and folder structure has to be maintained from the original published format. See the official data repo on https://zenodo.org/records/4607374
+
+After batch processing ROIs into one cohort, you may perform downstream analysis such as co-expression at the cohort level. See `./CLIscipts/cohort_coexpression.py` for implementation details.
 
 # Resources
 More details on the IMC technology can be found here ([external website)](https://visikol.com/imaging-mass-cytometry-services/?utm_term=hyperion%20imc&utm_source=adwords&utm_medium=ppc&utm_campaign=In+Vitro&hsa_src=g&hsa_kw=hyperion%20imc&hsa_mt=p&hsa_net=adwords&hsa_ver=3&hsa_ad=466715899865&hsa_tgt=kwd-958710387481&hsa_acc=4440962479&hsa_cam=11171160177&hsa_grp=109898052392&gclid=Cj0KCQiAw8OeBhCeARIsAGxWtUz8EEluaugz04nXZuagPi8EvYwd_9FSe_tFy_fW7mEalerXZS2MRSkaAlRQEALw_wcB).

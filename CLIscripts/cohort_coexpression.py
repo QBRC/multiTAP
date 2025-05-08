@@ -11,7 +11,7 @@ from typing import Union, Optional, Type, Tuple, List, Dict
 import sys
 from skimage.color import label2rgb
 import json
-import nrrd
+# import nrrd
 
 import pandas as pd
 import seaborn as sns
@@ -29,9 +29,13 @@ os.environ['OPENBLAS_NUM_THREADS'] = '64'
 one_slide = 'BaselTMA_SP43_25'
 
 ## TODO: Load your cohort files here
-cytof_cohort_whole_slide = pkl.load(open(os.path.join(ROOT_DIR, 'CLIscripts', 'SlideBaselTMA_SP43_25_final.pkl'), 'rb'))
-cytof_cohort_whole_slide.batch_process_feature()
-cytof_cohort_whole_slide.generate_summary()
+filename = '/project/DPDS/Xiao_lab/shared/deep_learning_SW_RR/cytof/multiTAP_public/multiTAP/CLIscripts/BaselTMA_SP43_25_verify/BaselTMA_SP43_25_verify.pkl'
+# filename = '/project/DPDS/Xiao_lab/shared/deep_learning_SW_RR/cytof/multiTAP_public/multiTAP/CLIscripts/BaselTMA_PTNM_T4/BaselTMA_PTNM_T4.pkl'
+# cytof_cohort_whole_slide = pkl.load(open(os.path.join(ROOT_DIR, 'CLIscripts', 'SlideBaselTMA_SP43_25_final.pkl'), 'rb'))
+# cytof_cohort_whole_slide = pkl.load(open(os.path.join(ROOT_DIR, 'CLIscripts', 'SlideBaselTMA_SP43_25_rerun.pkl'), 'rb'))
+cytof_cohort_whole_slide = pkl.load(open(filename, 'rb'))
+
+print(f'{cytof_cohort_whole_slide} successfully loaded')
 slide_co_expression_dict = cytof_cohort_whole_slide.co_expression_analysis()
 edge_percentage_norm, column_names = slide_co_expression_dict[one_slide]
 
@@ -43,6 +47,6 @@ clustergrid = sns.clustermap(edge_percentage_norm,
                             center=np.log10(1 + epsilon), cmap='RdBu_r', vmin=-1, vmax=3,
                             xticklabels=column_names_clean, yticklabels=column_names_clean)
 plt.title(one_slide)
-plt.savefig('figure-slide-coexp.pdf', format='pdf', dpi=300, bbox_inches='tight')
+plt.savefig('figure-slide-coexp-no-summary.pdf', format='pdf', dpi=300, bbox_inches='tight')
 
 print('Program completed.')
