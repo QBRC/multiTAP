@@ -73,8 +73,10 @@ class SetParameters():
 
 ##### reading csv in manually#####
 # # still required to contain the three keys (see above section)
-filename = '/project/Xie_Lab/zgu/xiao_multiplex/nsclc_multiTAP_work/nsclc_all.csv'
+filename = '/project/Xie_Lab/zgu/xiao_multiplex/nsclc_multiTAP_work/nsclc_group175_only.csv'
 df_nsclc_all = pd.read_csv(filename)
+df_nsclc_all = df_nsclc_all.head(2) # test case
+
 ##################################
 
 channel_dict = {

@@ -9,14 +9,16 @@ import tifffile
 from readimc import MCDFile
 
 search_folder = '/project/Xie_Lab/zgu/xiao_multiplex/data/zenodo_7961844'
-pattern = re.compile(r'.*_LC_NSCLC_TMA.*')
+# pattern = re.compile(r'.*_LC_NSCLC_TMA.*')
+pattern = re.compile(r'.*20201228_LC_NSCLC_TMA_175.*') # missed one folder decompressed to the wrong location
+
 matched_folders = [name for name in os.listdir(search_folder) if pattern.match(name)]
 print(matched_folders)
 
 # matched_folder = matched_folders[0] # test case
 
 
-output_dir = '/project/Xie_Lab/zgu/xiao_multiplex/nsclc_tiff_data'
+output_dir = '/project/Xie_Lab/zgu/xiao_multiplex/nsclc_tiff_data2'
 for matched_folder in matched_folders:
     print(f'========Processing folder {matched_folder}========')
     for mcd_paths in os.listdir(os.path.join(search_folder, matched_folder)):
