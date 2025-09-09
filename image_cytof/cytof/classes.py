@@ -1170,8 +1170,7 @@ class CytofCohort():
             "cell_ave": ["cell_ave", "cell_morphology"],
             "cell_sum_only": ["cell_sum"],
             "cell_ave_only": ["cell_ave"],
-            "cell_morphology": ['cell_morphology']
-        }
+        } # need at least cell sum/ave; cannot be just morphology; can't make cluster v. channel heatmap
         
         self.name = cohort_name
         self.dir_out = os.path.join(dir_out, self.name) if isinstance(dir_out, str) else None 
@@ -1349,14 +1348,16 @@ class CytofCohort():
             if "morphology" in y:
                 feat_names += self.dict_feat[y]
             else:
-                if channels == "all": # features extracted from all markers are kept
-                    feat_names += self.dict_feat[y] # TODO return actual channel names.
+                if channels == "all": # features extracted from all channels are kept
+                    feat_names += self.dict_feat[y] 
+                    channels_return = self.channels.copy() # return all channel names.
                 else: # only features correspond to markers kept (markers are a subset of self.markers)
-                    ids = [self.channels.index(x) for x in channels] # TODO: the case where marker in markers not in self.markers???
+                    ids = [self.channels.index(x) for x in channels]
                     feat_names += [self.dict_feat[y][x] for x in ids]
-        
+                    channels_return = channels.copy() # return only subset
+
         df_feature = getattr(self, n_attr)[feat_names]
-        return df_feature, channels, feat_names, description, n_attr
+        return df_feature, channels_return, feat_names, description, n_attr
     
     ###############################################################
     ################## PhenoGraph Clustering ######################
@@ -1378,7 +1379,7 @@ class CytofCohort():
         feat_type : str, optional
             for finding df_feature attribute for PhenoGraph, by default "normed_scaled"
         feat_set : str, optional
-            element in [cell_sum, cell_ave, cell_sum_only, cell_ave_only, cell_morphology, all]; all will include all aforementioned feature sets, by default "all"
+            element in [cell_sum, cell_ave, cell_sum_only, cell_ave_only, all]; all will include all aforementioned feature sets, by default "all"
         pheno_channels : Union[str, List], optional
             list of channels used for PhenoGraph, by default "all"
         k : int, optional
@@ -1430,7 +1431,7 @@ class CytofCohort():
         N = len(np.unique(communities))
         self.phenograph[key_pheno] = {
             "data": df_feature,
-            "markers": pheno_channels, # preserve key for downstream
+            "markers": channels, # preserve key for downstream
             "features": feat_names,
             "description": {"normalization": description, "feature_set": feat_set}, # normalization and/or scaling | set of feature (in self.feat_sets)
             "communities": communities, 
