@@ -1350,7 +1350,13 @@ class CytofCohort():
             else:
                 if channels == "all": # features extracted from all channels are kept
                     feat_names += self.dict_feat[y] 
-                    channels_return = self.channels.copy() # return all channel names.
+                    channels_return = self.channels.copy() # return all channel names except nuclei and membrane
+                    channels_return.remove('nuclei') # all instances have nuclei channel
+                    try:
+                        channels_return.remove('membrane') # some might not have membrane
+                    except ValueError:
+                        pass
+    
                 else: # only features correspond to markers kept (markers are a subset of self.markers)
                     ids = [self.channels.index(x) for x in channels]
                     feat_names += [self.dict_feat[y][x] for x in ids]
@@ -1533,9 +1539,9 @@ class CytofCohort():
             print("Visualization in 2d - {}-{}".format(level, key))
             savename = os.path.join(vis_savedir, f"cluster_scatter_{level}_{key}.png") if (save_vis and not plot_together) else None
             ax = axs[0] if plot_together else None
-            fig_scatter = visualize_scatter(data=proj_2d, communities=commu, n_community=n_community, 
+            fig_scatter, ax_scatter = visualize_scatter(data=proj_2d, communities=commu, n_community=n_community, 
                                             title=key, savename=savename, show=show_plots, ax=ax)
-            figs_scatter[key] = fig_scatter
+            figs_scatter[key] = (fig_scatter, ax_scatter)
             
             figs_exps[key]    = {}
             # Visualize 2: protein expression
@@ -1570,10 +1576,10 @@ class CytofCohort():
                     if (save_vis and not plot_together) else None
                 vis_exp = cluster_protein_exp_norm if normalize else cluster_protein_exp
                 ax = axs[axid+1] if plot_together else None
-                fig_exps = visualize_expression(data=vis_exp, markers=markers,
+                fig_exps, ax_exps = visualize_expression(data=vis_exp, markers=markers,
                                                 group_ids=group_ids, title="{} - {}-{}".format(level, acm_tpe, key), 
                                                 savename=savename, show=show_plots, ax=ax)
-                figs_exps[key][acm_tpe]   = fig_exps
+                figs_exps[key][acm_tpe]   = (fig_exps, ax_exps)
                 cluster_protein_exps[key] = vis_exp
             plt.tight_layout()
             if plot_together:
