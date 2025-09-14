@@ -65,7 +65,7 @@ TEST_RUN = False # only runs a small batch
 SAVED_GROUPS = [88, 178] if TEST_RUN else [86, 87, 88, 175, 176, 178]
 BASE_PKL_DIR = "/project/Xie_Lab/zgu/xiao_multiplex/nsclc_multiTAP_work"
 df_feature_name = 'df_feature_75normed'
-accumul_type = 'sum'
+accumul_type = 'ave'
 
 # contains the final list of patient included after quality check
 # for exclusion criteria see redistribute_save_groups.ipynb
@@ -103,10 +103,10 @@ for prefix in SAVED_GROUPS:
             # df_cohort not saved, creating one automatically from CytofCohort
             per_pt_cohort = CytofCohort(cytof_images=per_pt_roi_dict, dir_out=None)
             per_pt_cohort.batch_process_feature()
-            per_pt_cohort.generate_summary()
+            per_pt_cohort.generate_summary(accumul_type=accumul_type)
 
             # compute co-expression
-            slide_co_expression_dict = per_pt_cohort.co_expression_analysis()
+            slide_co_expression_dict = per_pt_cohort.co_expression_analysis(accumul_type=accumul_type)
             edge_percentage_norm, column_names = slide_co_expression_dict['NSCLC_ALL']
             edge_perc_remapped = pd.DataFrame(edge_percentage_norm, index=column_names, columns=column_names)
             
@@ -121,7 +121,7 @@ for prefix in SAVED_GROUPS:
 
     # save to csv to each .pkl
     combined_df = pd.concat(flat_marker_roi_list, axis=0, ignore_index=True)
-    combined_df.to_csv(os.path.join(BASE_PKL_DIR, f'nsclc_save_group{prefix}', f'nsclc_save_group{prefix}_flattened_coexp.csv'), index=False)
-    print('flattened co-exp csv saved to', os.path.join(BASE_PKL_DIR, f'nsclc_save_group{prefix}', f'nsclc_save_group{prefix}_flattened_coexp.csv'))
+    combined_df.to_csv(os.path.join(BASE_PKL_DIR, f'nsclc_save_group{prefix}', f'nsclc_save_group{prefix}_flattened_coexp_{accumul_type}.csv'), index=False)
+    print('flattened co-exp csv saved to', os.path.join(BASE_PKL_DIR, f'nsclc_save_group{prefix}', f'nsclc_save_group{prefix}_flattened_coexp_{accumul_type}.csv'))
 
 print('process completed.')

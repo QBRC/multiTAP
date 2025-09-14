@@ -387,7 +387,7 @@ def visualize_scatter(data, communities, n_community, title, figsize=(5,5), save
         plt.show()
     if clos:
         plt.close('all')
-    return fig
+    return fig, ax
 
 def visualize_expression(data, markers, group_ids, title, figsize=(5,5), savename=None, show=False, ax=None):
     clos = not show and ax is None
@@ -403,8 +403,8 @@ def visualize_expression(data, markers, group_ids, title, figsize=(5,5), savenam
                 yticklabels=group_ids,
                 ax=ax
                )
-    ax.set_xlabel("Markers")
-    ax.set_ylabel("Phenograph clusters")
+    # ax.set_xlabel("Markers")
+    ax.set_ylabel("PhenoGraph clusters")
     ax.set_title("normalized expression - {}".format(title))
     ax.xaxis.set_tick_params(labelsize=8)
     if savename is not None:
@@ -414,7 +414,7 @@ def visualize_expression(data, markers, group_ids, title, figsize=(5,5), savenam
         plt.show()
     if clos:
         plt.close('all')
-    return fig
+    return fig, ax
 
 def _get_thresholds(df_feature: pd.DataFrame,
                     features: List[str],

@@ -28,14 +28,13 @@ from cytof.classes import CytofImageTiff
 from cytof.classes import CytofCohort
 
 
-cytof_cohort_whole_slide = pkl.load(open("/project/Xie_Lab/zgu/xiao_multiplex/nsclc_multiTAP_work/nsclc_save_group88/nsclc_save_group88.pkl", 'rb'))
 SAVED_GROUPS = [86, 87, 88, 175, 176, 178]
 BASE_PKL_DIR = "/project/Xie_Lab/zgu/xiao_multiplex/nsclc_multiTAP_work"
 roi_pt_id_mapping = pd.read_csv('/project/Xie_Lab/zgu/xiao_multiplex/nsclc_multiTAP_work/roi_pt_id_mapping.csv')
 
 all_tumor_cells = 0
 all_nontumor_cells = 0
-accumul_type = 'ave'
+accumul_type = 'sum'
 feature_name = "75normed"
 df_feature_name = f"df_feature_{feature_name}"
 
@@ -55,48 +54,50 @@ for prefix in SAVED_GROUPS:
     # process for each patient
     for pt_id in prefix_pt_ids:
         print('\nProcessing Patient ID', pt_id)
+        per_pt_roi_dict = dict() # to be pass into CytofCohort later
 
         # load the pt's ROIs
         df_to_load = pt_prefix_rois[pt_prefix_rois['Patient_ID']==pt_id]
         print(len(df_to_load), 'ROIs identified for patient', pt_id)
 
-        # save individually for each ROI
-        for index, row in df_to_load.iterrows():
-            print('\nProcessing ROI', row['ROI'])
-
-            try:
-                # create key to access in save groups
+        try:
+            # load all of this pt's ROI into a new dict
+            for index, row in df_to_load.iterrows():
                 new_key = f"{row['SLIDE']}_{row['ROI']}"
-                cytof_img_roi = cytof_cohort_whole_slide.cytof_images[new_key]
-            
-                # df_cohort not saved, creating one automatically from CytofCohort
-                per_pt_cohort = CytofCohort(cytof_images={new_key:cytof_img_roi}, dir_out=None)
-                per_pt_cohort.batch_process_feature()
-                per_pt_cohort.generate_summary(accumul_type=accumul_type)
-                
+                per_pt_roi_dict[new_key] = cytof_cohort_whole_slide.cytof_images[new_key]
 
-                # get the feature extraction result
-                df_feature = getattr(cytof_img_roi, df_feature_name)
+            # df_cohort not saved, creating one automatically from CytofCohort
+            per_pt_cohort = CytofCohort(cytof_images=per_pt_roi_dict, dir_out=None)
+            per_pt_cohort.batch_process_feature()
+            per_pt_cohort.generate_summary(accumul_type=accumul_type)
+                
+                
+            # go through each roi, get their binary marker-cell expression
+            for key, cytof_img in per_pt_cohort.cytof_images.items():
+                
+                # get the mean expression and features
+                pt_binary_df = cytof_img.get_binary_pos_express_df(feature_name=feature_name, accumul_type=accumul_type)
+                df_feature = getattr(cytof_img, df_feature_name)
                 cell_coords = df_feature[["coordinate_x", "coordinate_y"]].copy()
-                cell_coords['roi_id'] = new_key
-                cell_coords['pt_id'] = row['Patient_ID']
-            
-                # get the binary expression df
-                df_binary_pos_exp = cytof_img_roi.get_binary_pos_express_df(feature_name, accumul_type)
-                
-                # concatenate the two df
-                df_binary_w_coords = pd.concat([cell_coords, df_binary_pos_exp], axis=1)
-                save_group_df_list.append(df_binary_w_coords)
-            
-            except Exception as e:
-                print(f'pt_id {pt_id} not processed due to error {e}')
 
+                # save the binary expression df for each ROI
+                save_binary_df = pt_binary_df.copy()
+                save_binary_df['pt_id'] = pt_id
+                save_binary_df['roi_id'] = key
+
+                # append coordinates to binary df
+                df_binary_w_coords = pd.concat([save_binary_df, cell_coords], axis=1)
+
+                save_group_df_list.append(df_binary_w_coords)
+
+        except Exception as e:
+            print(f'pt_id {pt_id} not processed due to error {e}')
     
     # concatenate to one df at the group level
     save_group_binary_df = pd.concat(save_group_df_list).reset_index(drop=True)
 
     # save to file
-    save_path = os.path.join(BASE_PKL_DIR, f'nsclc_save_group{prefix}', f'nsclc_save_group{prefix}_coordinates_binary_expr_df_{accumul_type}.csv')
+    save_path = os.path.join(BASE_PKL_DIR, f'nsclc_save_group{prefix}', f'nsclc_save_group{prefix}_coordinates_binary_expr_df_{accumul_type}2.csv')
     save_group_binary_df.to_csv(save_path, index=False)
 
     current_datetime = datetime.now()
