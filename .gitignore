@@ -4,6 +4,7 @@ test_out/
 test_data/*.pkl
 *test_data/*.pkl
 
+CLIscripts/logs/*
 
 
 notebooks/developer/BaselTMA*

@@ -488,7 +488,6 @@ class CytofImage():
         # attach quantile dictionary to self
         self.dict_quantiles = quantiles
 
-        print('dict quantiles:', quantiles)
         # return quantiles
 
     def _vis_normalization(self, savename: Optional[str] = None):
@@ -1170,15 +1169,14 @@ class CytofCohort():
             "cell_sum": ["cell_sum", "cell_morphology"],
             "cell_ave": ["cell_ave", "cell_morphology"],
             "cell_sum_only": ["cell_sum"],
-            "cell_ave_only": ["cell_ave"]
-        }
+            "cell_ave_only": ["cell_ave"],
+        } # need at least cell sum/ave; cannot be just morphology; can't make cluster v. channel heatmap
         
         self.name = cohort_name
-        print('dir_out:', dir_out, type(dir_out))
         self.dir_out = os.path.join(dir_out, self.name) if isinstance(dir_out, str) else None 
         if self.dir_out:
-            print('Output folder created:', self.dir_out)        
             os.makedirs(self.dir_out, exist_ok=True)
+            print('Output folder created:', self.dir_out)        
 
     def __getitem__(self, key):
         'Extracts a particular cytof image from the cohort'
@@ -1211,8 +1209,9 @@ class CytofCohort():
                 setattr(self, "dict_feat", cytof_img.features)
             if not hasattr(self, "markers"):
                 setattr(self, "markers", cytof_img.markers)
+            if not hasattr(self, "channels"):
+                setattr(self, "channels", cytof_img.channels)
 
-            print('dict quantiles in batch process:', cytof_img.dict_quantiles)
             try:
                 qs &= set(list(cytof_img.dict_quantiles.keys()))
             except:
@@ -1329,12 +1328,12 @@ class CytofCohort():
                            normq: int = 75, 
                            feat_type: str = "normed_scaled", 
                            feat_set: str = "all", 
-                           markers: str = "all", 
+                           channels: Union[str, List] = "all", 
                            verbose: bool = False):
 
         assert feat_type in ["normed_scaled", "normed", ""], f"feature type {feat_type} not supported!"
-        assert (markers == "all" or isinstance(markers, list))
-        assert feat_set in self.feat_sets.keys(), f"feature set {feat_set} not supported!"
+        assert (channels == "all" or set(channels).issubset(set(self.channels))), f"input channels {channels} not a subset of self.channels" 
+        assert feat_set in self.feat_sets.keys() , f"feature set {feat_set} not supported!"
         
         description = "original" if feat_type=="" else f"{normq}{feat_type}"
         n_attr      = f"df_feature{feat_type}" if feat_type=="" else f"df_feature_{normq}{feat_type}" # the attribute name to achieve from cytof_img
@@ -1349,15 +1348,22 @@ class CytofCohort():
             if "morphology" in y:
                 feat_names += self.dict_feat[y]
             else:
-                if markers == "all": # features extracted from all markers are kept
-                    feat_names += self.dict_feat[y]
-                    markers = self.markers
+                if channels == "all": # features extracted from all channels are kept
+                    feat_names += self.dict_feat[y] 
+                    channels_return = self.channels.copy() # return all channel names except nuclei and membrane
+                    channels_return.remove('nuclei') # all instances have nuclei channel
+                    try:
+                        channels_return.remove('membrane') # some might not have membrane
+                    except ValueError:
+                        pass
+    
                 else: # only features correspond to markers kept (markers are a subset of self.markers)
-                    ids = [self.markers.index(x) for x in markers] # TODO: the case where marker in markers not in self.markers???
+                    ids = [self.channels.index(x) for x in channels]
                     feat_names += [self.dict_feat[y][x] for x in ids]
-        
+                    channels_return = channels.copy() # return only subset
+
         df_feature = getattr(self, n_attr)[feat_names]
-        return df_feature, markers, feat_names, description, n_attr
+        return df_feature, channels_return, feat_names, description, n_attr
     
     ###############################################################
     ################## PhenoGraph Clustering ######################
@@ -1366,21 +1372,46 @@ class CytofCohort():
                               normq:int = 75, 
                               feat_type:str = "normed_scaled", 
                               feat_set: str = "all", 
-                              pheno_markers: Union[str, List] = "all", 
+                              pheno_channels: Union[str, List] = "all", 
                               k: int = None, 
                               save_vis: bool = False,
                               verbose:bool = True):
+        """performs PhenoGraph clustering on normalized and/or scaled features
+
+        Parameters
+        ----------
+        normq : int, optional
+            xth quantile of normalization; for finding df_feature attribute, by default 75
+        feat_type : str, optional
+            for finding df_feature attribute for PhenoGraph, by default "normed_scaled"
+        feat_set : str, optional
+            element in [cell_sum, cell_ave, cell_sum_only, cell_ave_only, all]; all will include all aforementioned feature sets, by default "all"
+        pheno_channels : Union[str, List], optional
+            list of channels used for PhenoGraph, by default "all"
+        k : int, optional
+            k neighbors, by default None
+        save_vis : bool, optional
+            whether to save viasualization, by default False
+        verbose : bool, optional
+            whether to print progress details, by default True
+
+        Returns
+        -------
+        key_pheno
+            string literal that can be indexed in self.phenograph
+        """
+                    
         
-        if pheno_markers == "all":
-            pheno_markers_ = "_all"
+        if pheno_channels == "all":
+            pheno_channels_ = "_all"
         else:
-            pheno_markers_ = "_subset1"
+            pheno_channels_ = "_subset1"
 
         assert feat_type in ["normed_scaled", "normed", ""], f"feature type {feat_type} not supported!"
-        df_feature, pheno_markers, feat_names, description, n_attr = self._get_feature_subset(normq=normq,
+        df_feature, channels, feat_names, description, n_attr = self._get_feature_subset(normq=normq,
                                                                                           feat_type=feat_type,
                                                                                           feat_set=feat_set,
-                                                                                          markers=pheno_markers,
+                                                                                          channels=pheno_channels,
                                                                                           verbose=verbose)
         # set number of nearest neighbors k and run PhenoGraph for phenotype clustering
         k = k if k else int(df_feature.shape[0] / 100) 
@@ -1400,13 +1431,13 @@ class CytofCohort():
         if not hasattr(self, "phenograph"):
             setattr(self, "phenograph", {})
         key_pheno  = f"{description}_{feat_set}_feature_{k}"
-        key_pheno += f"{pheno_markers_}_markers" 
+        key_pheno += f"{pheno_channels_}_markers" 
             
             
         N = len(np.unique(communities))
         self.phenograph[key_pheno] = {
             "data": df_feature,
-            "markers": pheno_markers,
+            "markers": channels, # preserve key for downstream
             "features": feat_names,
             "description": {"normalization": description, "feature_set": feat_set}, # normalization and/or scaling | set of feature (in self.feat_sets)
             "communities": communities, 
@@ -1508,9 +1539,9 @@ class CytofCohort():
             print("Visualization in 2d - {}-{}".format(level, key))
             savename = os.path.join(vis_savedir, f"cluster_scatter_{level}_{key}.png") if (save_vis and not plot_together) else None
             ax = axs[0] if plot_together else None
-            fig_scatter = visualize_scatter(data=proj_2d, communities=commu, n_community=n_community, 
+            fig_scatter, ax_scatter = visualize_scatter(data=proj_2d, communities=commu, n_community=n_community, 
                                             title=key, savename=savename, show=show_plots, ax=ax)
-            figs_scatter[key] = fig_scatter
+            figs_scatter[key] = (fig_scatter, ax_scatter)
             
             figs_exps[key]    = {}
             # Visualize 2: protein expression
@@ -1545,10 +1576,10 @@ class CytofCohort():
                     if (save_vis and not plot_together) else None
                 vis_exp = cluster_protein_exp_norm if normalize else cluster_protein_exp
                 ax = axs[axid+1] if plot_together else None
-                fig_exps = visualize_expression(data=vis_exp, markers=markers,
+                fig_exps, ax_exps = visualize_expression(data=vis_exp, markers=markers,
                                                 group_ids=group_ids, title="{} - {}-{}".format(level, acm_tpe, key), 
                                                 savename=savename, show=show_plots, ax=ax)
-                figs_exps[key][acm_tpe]   = fig_exps
+                figs_exps[key][acm_tpe]   = (fig_exps, ax_exps)
                 cluster_protein_exps[key] = vis_exp
             plt.tight_layout()
             if plot_together:
