@@ -1,4 +1,4 @@
-# this file reads inflates data collected from https://zenodo.org/records/7961844
+# this file reads inflated data collected from https://zenodo.org/records/7961844
 import numpy as np
 import os
 import pickle as pkl
@@ -14,9 +14,6 @@ pattern = re.compile(r'.*20201228_LC_NSCLC_TMA_175.*') # missed one folder decom
 
 matched_folders = [name for name in os.listdir(search_folder) if pattern.match(name)]
 print(matched_folders)
-
-# matched_folder = matched_folders[0] # test case
-
 
 output_dir = '/project/Xie_Lab/zgu/xiao_multiplex/nsclc_tiff_data2'
 for matched_folder in matched_folders:
