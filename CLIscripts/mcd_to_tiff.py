@@ -8,22 +8,34 @@ import re
 import tifffile
 from readimc import MCDFile
 
-search_folder = '/project/Xie_Lab/zgu/xiao_multiplex/data/zenodo_7961844'
-# pattern = re.compile(r'.*_LC_NSCLC_TMA.*')
-pattern = re.compile(r'.*20201228_LC_NSCLC_TMA_175.*') # missed one folder decompressed to the wrong location
+# ######Specific to the NSCLC cohort from Cords, Lena, et al. Cancer cell 42.3 (2024): 396-412. ######
+# search_folder = '/project/Xie_Lab/zgu/xiao_multiplex/data/zenodo_7961844' # the parent folder that contains the data folder
+# pattern = re.compile(r'.*_LC_NSCLC_TMA.*') # identifiers for the folder that contains .mcd files
+# ##########################################
+
+######General cases######
+search_folder = '/project/Xie_Lab/zgu/xiao_multiplex'  # the parent folder that contains the data folder
+pattern = re.compile(r'.*sclc_data_mdacc*') # identifiers for the folder that contains .mcd files
+##########################################
 
 matched_folders = [name for name in os.listdir(search_folder) if pattern.match(name)]
 print(matched_folders)
 
-output_dir = '/project/Xie_Lab/zgu/xiao_multiplex/nsclc_tiff_data2'
+output_dir = '/project/Xie_Lab/zgu/xiao_multiplex/sclc_data_mdacc/tiffs'
+
 for matched_folder in matched_folders:
     print(f'========Processing folder {matched_folder}========')
     for mcd_paths in os.listdir(os.path.join(search_folder, matched_folder)):
         group = mcd_paths.split('.')[0] # e.g. 2020115_LC_NSCLC_TMA_86_A
 
-        accession_find = re.search(r'_([0-9]+_[A-Z])\.mcd$', mcd_paths) # find by digits then a capital letter then .mcd
-        if accession_find:
-            accession = accession_find.group(1)
+        ######Specific to the NSCLC######
+        # accession_find = re.search(r'_([0-9]+_[A-Z])\.mcd$', mcd_paths) # find by digits then a capital letter then .mcd
+        #################################
+
+        # general case
+        accession_find = re.search(r'\.mcd$', mcd_paths, re.IGNORECASE)
+        
+        if not accession_find: continue # skip iteration if no match
 
         # path to the actual mcd file
         mcd_file = os.path.join(search_folder, matched_folder, mcd_paths)
