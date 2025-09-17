@@ -137,7 +137,7 @@ class CytofImage():
             self.df = pd.concat([self.df, df2])
 
     def quality_control(self, thres: int = 50) -> None:
-        setattr(self, "keep", False)
+        setattr(self, "keep", True)
         if (max(self.df['X']) < thres) \
                 or (max(self.df['Y']) < thres):
             print("At least one dimension of the image {}-{} is smaller than {}, exclude from analyzing" \
@@ -978,8 +978,19 @@ class CytofImageTiff(CytofImage):
         return new_instance
     
     def quality_control(self,  thres: int = 50) -> None:
-        setattr(self, "keep", False)
-        if any([x < thres for x in self.image.shape]):
+        setattr(self, "keep", True)
+
+        shape = self.image.shape
+
+        if len(shape) == 2:
+            # Just height and width
+            dims_to_check = shape
+        else:
+            # Assume the channel dimension is the smallest one
+            channel_dim = min(shape)
+            dims_to_check = [d for d in shape if d != channel_dim]
+
+        if any(x < thres for x in dims_to_check):
             print(f"At least one dimension of the image {self.slide}-{self.roi} is smaller than {thres}, \
                 hence exclude from analyzing" )
             self.keep = False

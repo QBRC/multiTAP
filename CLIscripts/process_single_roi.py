@@ -95,7 +95,7 @@ def process_single(params: SetParameters,
     print('Processing', params.slide, 'ROI', params.roi)
 
     cytof_img.quality_control(thres=params.quality_control_thres)
-    if not cytof_img.keep and (not downstream_analysis):
+    if cytof_img.keep and (not downstream_analysis):
         cytof_img = image_to_feature(cytof_img, params)
         return cytof_img
 
