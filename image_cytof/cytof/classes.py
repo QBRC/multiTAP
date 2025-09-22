@@ -1953,3 +1953,38 @@ class CytofCohort():
             slide_co_expression_dict[slide_key] = (edge_percentage_norm, df_expected.columns)
 
         return slide_co_expression_dict
+
+
+    def cohort_interaction_graphs(self, feature_name, accumul_type, method: str = "distance", threshold=50):
+        assert method in ["distance", "k-neighbor"], "Method can be either 'distance' or 'k-neighbor'!"
+        
+        # used to store ROI-level interaction graphs
+        marker_roi_list = list()
+
+        for roi_keys, cytof_img in self.cytof_images.items():
+            print(f"Processing ROI {roi_keys}")
+            df_expected_prob, df_cell_interaction_prob = cytof_img.roi_interaction_graphs(feature_name=feature_name, accumul_type=accumul_type, method=method, threshold=threshold, return_components=False)
+
+            # do some post processing
+            marker_all = df_expected_prob.columns
+            epsilon = 1e-6
+
+            # Normalize and fix Nan
+            edge_percentage_norm = np.log10(df_cell_interaction_prob.values / (df_expected_prob.values+epsilon) + epsilon)
+
+            # if observed/expected = 0, then log odds ratio will have log10(epsilon)
+            # no observed means interaction cannot be determined, does not mean strong negative interaction
+            edge_percentage_norm[edge_percentage_norm == np.log10(epsilon)] = 0
+
+            edge_perc_remapped = pd.DataFrame(edge_percentage_norm, index=marker_all, columns=marker_all)
+            edge_perc_remapped["roi_id"] = roi_keys
+            marker_roi_list.append(edge_perc_remapped)
+
+        # concatenate all pt df
+        edge_percentage_cohort = pd.concat(marker_roi_list, axis=0)
+        edge_percentage_cohort = edge_percentage_cohort.reset_index(names='marker')
+
+        # cohort specific: 0 was used to indicate not observed, but average over will skew the df
+        edge_percentage_cohort = edge_percentage_cohort.replace(0, np.nan)
+
+        return edge_percentage_cohort, marker_all
