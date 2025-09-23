@@ -4,7 +4,7 @@ Using a publicly available dataset (Cords, Lena, et al. "Cancer-associated fibro
 Steps:
 1. `CLIscripts/mcd_to_tiff.py` reads in the original MCD files downloaded from Zenodo and converts acquisitions to TIFF files. All images will be stored in `output_dir`.
 
-1. `CLIscripts/batch_process_feature.py` reads in a `.csv` file to process IMC cores in batch. The CSV file needs to contain slides, ROI, TIFF file path. The `save_group` argument is used here as a single .pkl with 2000+ IMC cores were too memory intensive. Note: `channel_dict` defines the **required** `nuclei` channels and the *optional* membrane channels. Here we used transmembrane proteins as membrane markers. For other parameters, refer to the `tutorial-Single-[tiff, txt, mcd].ipynb` for detailed documentations. After batch processing, the specified `dir_out` should have the following structure:
+1. `CLIscripts/batch_process_feature.py` reads in a `.csv` file to process IMC cores in batch. The CSV file needs to contain slides, ROI, TIFF file path. The `save_group` argument is used here as a single .pkl with 2000+ IMC cores were too memory intensive. Note: `channel_dict` defines the **required** `nuclei` channels and the *optional* membrane channels. Here we used transmembrane proteins as membrane markers. For other parameters, first refer to `tutorial-explore-mcd.ipynb` for documentations. Optionally, `tutorial-Single-[tiff, txt, mcd].ipynb` contains advanced parameters if needed. After batch processing, the specified `dir_out` should have the following structure:
  ```text
     .
     ├── dir_out/
@@ -21,6 +21,6 @@ Steps:
 
 1. `nsclc_tutorial/marker_to_cell_subtypes.py` reads in the the preprocessed binary marker expression `.csv` files, separates cells into tumor and nontuomor, then separates the nontumor into immune, vessel, and cancer-associated fibroblasts (CAFs). This creates a single `.csv` for all nontumor cells in all patients.
 
-1. `nsclc_tutorial/spatial_from_mapped_cell_types.py` reads in the subtype classification file, and constructs a (k=15)-neighbor network graph based on the cell coordinates and assigned subtypes within each ROI. The spatial interactions within the 27 cell subtypes are computed. A dataframe with shape 27*len(roi) x 28 [27 markers + roi_id] is saved. An example is available in `notebooks/preprocessed/nontumor_spatial_kneighbor15_sum.csv`
+1. `nsclc_tutorial/spatial_from_mapped_cell_types.py` reads in the subtype classification file, and constructs a (k=15)-neighbor network graph based on the cell coordinates and assigned subtypes within each ROI. The spatial interactions within the 27 cell subtypes are computed. A dataframe with shape 27*len(roi) x 28 is saved. The columns of the dataframe contains 27 markers and one roi_id. An example is available in `notebooks/preprocessed/nontumor_spatial_kneighbor15_sum.csv`
 
 1. `notebooks/tutorial-figures.ipynb` In header `Figure 6B`, the dataframe is averaged across all ROIs and an `sns.clustermap() is constructed`. In `Figure 6C`, each ROI-level spatial interaction matrix was flattened, and patient survival data is merged. Log-rank tests were computed for each pairwise interaction in 953 eligible patients, and FDR-adjusted p-values are reported.
