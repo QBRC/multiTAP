@@ -1489,7 +1489,8 @@ class CytofCohort():
                        save_vis: bool = False,
                        show_plots: bool = False,
                        plot_together: bool = True,
-                       fig_width: int = 5 # only when plot_together is True
+                       fig_width: int = 5, # only when plot_together is True,
+                       scatter_dot_size: int = 2
                        ):
         assert level.upper() in ["COHORT", "SLIDE", "ROI"], "Only 'cohort', 'slide' and 'roi' are accetable values for level"
         this_pheno = self.phenograph[key_pheno]
@@ -1546,15 +1547,17 @@ class CytofCohort():
                 fig, axs = plt.subplots(1,ncol, figsize=(ncol*fig_width, fig_width))
             proj_2d = proj_2ds[key]
             commu = commus[key]
+
             # Visualize 1: plot 2d projection together
             print("Visualization in 2d - {}-{}".format(level, key))
             savename = os.path.join(vis_savedir, f"cluster_scatter_{level}_{key}.png") if (save_vis and not plot_together) else None
             ax = axs[0] if plot_together else None
             fig_scatter, ax_scatter = visualize_scatter(data=proj_2d, communities=commu, n_community=n_community, 
-                                            title=key, savename=savename, show=show_plots, ax=ax)
+                                            title=key, scatter_dot_size=scatter_dot_size, savename=savename, show=show_plots, ax=ax)
             figs_scatter[key] = (fig_scatter, ax_scatter)
             
             figs_exps[key]    = {}
+
             # Visualize 2: protein expression
             for axid, acm_tpe in enumerate(accumul_type):
                 ids = [i for (i, x) in enumerate(feat_names) if re.search(".{}".format(acm_tpe), x)]
