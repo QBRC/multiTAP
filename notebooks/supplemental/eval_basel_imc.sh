@@ -1,1 +1,0 @@
-CUDA_VISIBLE_DEVICES=1 nohup python -u eval_cellprofiler_titan.py > final_eval_log.log &
