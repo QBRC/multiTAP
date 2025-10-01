@@ -1,0 +1,3 @@
+labels: ['DNA', 'MCT1', 'CD8a', 'MCT4', 'CD31']
+        
+markers: ['DAPI', 'Opal 570', 'Opal 480', 'Opal 620', 'Opal 520']
