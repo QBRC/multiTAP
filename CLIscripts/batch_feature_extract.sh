@@ -1,4 +1,10 @@
-nohup python -u batch_process_feature.py > logs/SCLC_MDACC2.log 2>&1 &
+#!/bin/bash
+#SBATCH --job-name=mdacc_sclc
+#SBATCH --output=logs/batch160_%j.out
+#SBATCH --error=logs/batch160_%j.err
+#SBATCH --partition=256GB
+#SBATCH --cpus-per-task=64
+#SBATCH --mem=128G	
+#SBATCH --time=48:00:00
 
-# taskset sets the CPU to run based on CPU affinity
-# CUDA_VISIBLE_DEVICES=3 nohup taskset -c 1,3,5,7,9,11 python -u batch_process_feature.py > logs/feat_extract_test2.log 2>&1 &
+nohup python -u batch_process_feature.py > logs/SCLC_MDACC2.log 2>&1 &

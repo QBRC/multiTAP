@@ -50,6 +50,14 @@ class SetParameters():
         self.cell_radius     = cell_radius
         self.normalize_qs    = normalize_qs
 
+
+##### reading csv in manually#####
+# see example format in `example_data`
+# helper function to generate `test_cohort.csv` below and in `tutorial-MCD-explore.ipynb`
+filename = 'ROOT_DIR/multiTap/example_data/test_cohort.csv'
+df_nsclc_all = pd.read_csv(filename)
+##################################
+
 ##### generates a pandas df to save as cohorts#####
 # one_slide = 'BaselTMA_SP43_25'
 # IMC_FOLDER = '/archive/DPDS/Xiao_lab/shared/shidan/hyperion/The Single-Cell Pathology Landscape of Breast Cancer/OMEandSingleCellMasks/OMEnMasks/ome/ome'
@@ -68,18 +76,10 @@ class SetParameters():
 # # Third input is the corresponding file path
 # # df is required to have three keys for downstream analysis: 'Slide', 'ROI', 'input file'
 # df_cohort_to_load = pd.DataFrame({"Slide": slides, "ROI": roi_name, "input file": fs_input}) 
-# df_cohort_to_load.to_csv('df_cohort_to_load.csv', index=False)
+# df_cohort_to_load.to_csv('test_cohort.csv', index=False)
 ####################################################
 
-##### reading csv in manually#####
-# # still required to contain the three keys (see above section)
-# filename = '/project/Xie_Lab/zgu/xiao_multiplex/nsclc_multiTAP_work/nsclc_group175_only.csv'
-filename = '/project/Xie_Lab/zgu/xiao_multiplex/sclc_multiTAP_work/df_cohort_to_load.csv'
-df_nsclc_all = pd.read_csv(filename)
-# df_nsclc_all = df_nsclc_all.head(2) # test case
-##################################
-
-##### NSCLC Basel configs #####
+##### NSCLC Basel configs ##########################
 # channel_dict = {
 #         'nuclei': ['Iridium_1033((1253))Ir191-Ir191', 'Iridium_1033((1254))Ir193-Ir193'],
         
@@ -115,7 +115,7 @@ channel_dict = {
 
 params_cohort = {
   
-  # nsclc Basel
+# nsclc Basel
 #   'channels_remove': ['208Pb-Pb208', '207Pb-Pb207', '205Tl-Tl205', '204Pb-Pb204', '203Tl-Tl203', '202Hg-Hg202', '201Hg-Hg201', '200Hg-Hg200', '199Hg-Hg199', '198Hg-Hg198', '197Au-Au197', '196Pt-Pt196', '192Pt-Pt192', '190Os-Os190', '189Os-Os189', '188Os-Os188', '187Os-Os187', '186Os-Os186', '185Re-Re185', '184W-W184', '183W-W183', '182W-W182', '181Ta-Ta181', '180Hf-Hf180', '179Hf-Hf179', '178Hf-Hf178', '177Hf-Hf177', '157Gd-Gd157', '140Ce-Ce140', '139La-La139', '138Ba-Ba138', '137Ba-Ba137', '136Ba-Ba136', '135Ba-Ba135', '134Ba-Ba134', '133Cs-Cs133', '132Xe-Xe132', '131Xe-Xe131', '130Xe-Xe130', '129Xe-Xe129', '128Xe-Xe128', '127I-I127', '126Te-Te126', '125Te-Te125', '124Te-Te124', '123Te-Te123', '122Te-Te122', '121Sb-Sb121', '120Sn-Sn120', '119Sn-Sn119', '118Sn-Sn118', '116Sn-Sn116', '114Cd-Cd114', '112Cd-Cd112', '111Cd-Cd111', '110Cd-Cd110', '109Ag-Ag109', '108Cd-Cd108', '107Ag-Ag107', '106Pd-Pd106', '105Pd-Pd105', '104Pd-Pd104', '103Rh-Rh103', '102Ru-Ru102', '101Ru-Ru101', '100Ru-Ru100', '99Ru-Ru99', '98Mo-Mo98', '97Mo-Mo97', '96Mo-Mo96', '95Mo-Mo95', '94Mo-Mo94', '93Nb-Nb93', '92Zr-Zr92', '91Zr-Zr91', '90Zr-Zr90', '88Sr-Sr88', '87Sr-Sr87', '86Sr-Sr86', '85Rb-Rb85', '84Sr-Sr84', '83Kr-Kr83', '82Kr-Kr82', '81Br-Br81', '80ArAr-ArAr80', '78Se-Se78', '77Se-Se77', '76Se-Se76', '75As-As75'],
 #   'label_marker_file': "/project/Xie_Lab/zgu/xiao_multiplex/nsclc_multiTAP_work/marker_labels.txt",
 

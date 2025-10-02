@@ -30,9 +30,6 @@ one_slide = 'BaselTMA_SP43_25'
 
 ## TODO: Load your cohort files here
 filename = '/project/DPDS/Xiao_lab/shared/deep_learning_SW_RR/cytof/multiTAP_public/multiTAP/CLIscripts/BaselTMA_SP43_25_verify/BaselTMA_SP43_25_verify.pkl'
-# filename = '/project/DPDS/Xiao_lab/shared/deep_learning_SW_RR/cytof/multiTAP_public/multiTAP/CLIscripts/BaselTMA_PTNM_T4/BaselTMA_PTNM_T4.pkl'
-# cytof_cohort_whole_slide = pkl.load(open(os.path.join(ROOT_DIR, 'CLIscripts', 'SlideBaselTMA_SP43_25_final.pkl'), 'rb'))
-# cytof_cohort_whole_slide = pkl.load(open(os.path.join(ROOT_DIR, 'CLIscripts', 'SlideBaselTMA_SP43_25_rerun.pkl'), 'rb'))
 cytof_cohort_whole_slide = pkl.load(open(filename, 'rb'))
 
 print(f'{cytof_cohort_whole_slide} successfully loaded')

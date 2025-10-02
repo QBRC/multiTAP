@@ -1,4 +1,7 @@
-# this file reads inflated data collected from https://zenodo.org/records/7961844
+# This file showcases on reading inflated data collected from 
+# (Cords, L., Engler, S., Haberecker, M., Rüschoff, J.-H., Moch, H., de Souza, N., & Bodenmiller, B. (2023). Cancer-associated fibroblast phenotypes predict patient outcome in non-small cell lung cancer (1.0) [Data set]. Zenodo. https://doi.org/10.5281/zenodo.7961844)
+# and converts all acquisitions inside .mcd to .tiff
+
 import numpy as np
 import os
 import pickle as pkl

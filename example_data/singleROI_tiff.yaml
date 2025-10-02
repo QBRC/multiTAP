@@ -3,7 +3,9 @@ filename: /archive/DPDS/Xiao_lab/shared/shidan/hyperion/The Single-Cell Patholog
 outdir: ./test_out # output saving directory, required
 channels_dict: # a dictionary that defines special channels "nuclei", "membrane" (optional)
   nuclei: ['DNA1-Ir191', 'DNA2-Ir193']    # dictionary key "nuclei" required
-  membrane: ['Vimentin-Sm149', 'c-erbB-2 - Her2-Eu151', 'pan Cytokeratin-Keratin Epithelial-Lu175', 'CD44-Gd160','Fibronectin-Nd142']  # dictionary key "membrane" optional
+
+  # dictionary key "membrane" optional
+  membrane: ['Vimentin-Sm149', 'c-erbB-2 - Her2-Eu151', 'pan Cytokeratin-Keratin Epithelial-Lu175', 'CD44-Gd160','Fibronectin-Nd142']  
 
 # Optional parameters
 label_marker_file: /archive/DPDS/Xiao_lab/shared/hudanyun_sheng/github/image_cytof_test_data/external_data/The Single-Cell Pathology Landscape of Breast Cancer/markers_labels.txt # full file path of the label-marker file, optional
