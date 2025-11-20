@@ -20,7 +20,8 @@ The links above should open to the following analysis page:
 
 In this tutorial, we will utilize a publicly available breast cancer dataset containing 352 patients sourced from University Hospital Basel and University Hospital Zurich (original paper [here](https://pubmed.ncbi.nlm.nih.gov/31959985/)).
 
-ROI `BaselTMA_SP43_25.8kx22ky_10500x6500_8_20170928_114_115_X4Y8_262_a0_full` is used. For convenience, you may download this ROI at https://qbrc.swmed.edu/labs/xiaoxie/download/multiplex/example_image.tiff
+> [!NOTE]  
+> ROI `BaselTMA_SP43_25.8kx22ky_10500x6500_8_20170928_114_115_X4Y8_262_a0_full` is used. For convenience, you may download this ROI at https://qbrc.swmed.edu/labs/xiaoxie/download/multiplex/example_image.tiff
 
 TIFF files contain Regions of Interest (ROIs) stored as multiplexed images. Since marker information is not available from the provided TIFF alone, we need an additional `Marker File` with lists of channels to identify the antibodies.
 
@@ -47,7 +48,8 @@ After loading the two files to the GUI, you would be able to read individual mar
 - CD44-Gd160
 - Fibronectin-Nd142
 
-Note: not all IMC slides are imaged with membrane-specific antibodies. This depends heavily on study design and objectives.
+> [!IMPORTANT]
+> Not all IMC slides are imaged with membrane-specific antibodies. This depends heavily on study design and objectives.
 
 Example selection on the GUI:
 <img src="doc_img/public-step2.png">
@@ -56,7 +58,8 @@ Example selection on the GUI:
 After defining the channels and set the radius to 5, the cells will be segmented similar to the following:
 <img src="doc_img/public-step3.png">
 
-Note: This plot is generated via *Plotly* so you may interact with the segmentation by zooming and panning.
+> [!NOTE]  
+> This plot is generated via *Plotly* so you may interact with the segmentation by zooming and panning.
 
 After segmentation, you can extract the cellular features. This will output a CSV file containing morphological features of the data. You can find the file in the `output`` directory. Below is a summary of the features available.
 
