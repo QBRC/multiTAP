@@ -4,11 +4,7 @@ Using a publicly available dataset (Cords, Lena, et al. "Cancer-associated fibro
 Steps:
 1. `CLIscripts/mcd_to_tiff.py` reads in the original MCD files downloaded from Zenodo and converts acquisitions to TIFF files. All images will be stored in `output_dir`.
 
-1. `CLIscripts/batch_process_feature.py` reads in a `.csv` file to process IMC cores in batch. The CSV file needs to contain slides, ROI, TIFF file path. A template is shown in `CLIscripts/templates/example_cohort.csv`.
-> [Note]
-> The `save_group` argument is used here as a single .pkl with 2000+ IMC cores were too memory intensive. 
-
-`channel_dict` defines the **required** `nuclei` channels and the *optional* membrane channels. Here we used transmembrane proteins as membrane markers. For other parameters, first refer to `tutorial-MCD-explore.ipynb` for documentations. Optionally, `tutorial-Single-ROI-tiff.ipynb` contains advanced parameters if needed. After batch processing, the specified `dir_out` should have the following structure:
+1. `CLIscripts/batch_process_feature.py` reads in a `.csv` file to process IMC cores in batch. The CSV file needs to contain slides, ROI, TIFF file path. A template is shown in `CLIscripts/templates/example_cohort.csv`. `channel_dict` defines the **required** `nuclei` channels and the *optional* membrane channels. Here we used transmembrane proteins as membrane markers. For other parameters, first refer to `tutorial-MCD-explore.ipynb` for documentations. Optionally, `tutorial-Single-ROI-tiff.ipynb` contains advanced parameters if needed. After batch processing, the specified `dir_out` should have the following structure:
  ```text
     .
     ├── dir_out/
@@ -20,6 +16,9 @@ Steps:
     │   ├── nsclc_save_group178/
     │   │   └── nsclc_save_group178.pkl
 ```
+> [!Note]
+> An additional column `save_group` is used in NSCLC dataset as a single .pkl with 2000+ IMC cores were too memory intensive. 
+
 
 1. `nsclc_tutorial/save_df_feature.py` reads in saved `.pkl` files and generates marker level summary. For each image, the binary positive expression dataframe and  cell coordinates are extracted. All patients with the same prefix (i.e. within the same save group) are saved to one `.csv`.
 
