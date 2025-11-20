@@ -137,7 +137,7 @@ class CytofImage():
             self.df = pd.concat([self.df, df2])
 
     def quality_control(self, thres: int = 50) -> None:
-        setattr(self, "keep", False)
+        setattr(self, "keep", True)
         if (max(self.df['X']) < thres) \
                 or (max(self.df['Y']) < thres):
             print("At least one dimension of the image {}-{} is smaller than {}, exclude from analyzing" \
@@ -978,8 +978,19 @@ class CytofImageTiff(CytofImage):
         return new_instance
     
     def quality_control(self,  thres: int = 50) -> None:
-        setattr(self, "keep", False)
-        if any([x < thres for x in self.image.shape]):
+        setattr(self, "keep", True)
+
+        shape = self.image.shape
+
+        if len(shape) == 2:
+            # Just height and width
+            dims_to_check = shape
+        else:
+            # Assume the channel dimension is the smallest one
+            channel_dim = min(shape)
+            dims_to_check = [d for d in shape if d != channel_dim]
+
+        if any(x < thres for x in dims_to_check):
             print(f"At least one dimension of the image {self.slide}-{self.roi} is smaller than {thres}, \
                 hence exclude from analyzing" )
             self.keep = False
@@ -1478,7 +1489,8 @@ class CytofCohort():
                        save_vis: bool = False,
                        show_plots: bool = False,
                        plot_together: bool = True,
-                       fig_width: int = 5 # only when plot_together is True
+                       fig_width: int = 5, # only when plot_together is True,
+                       scatter_dot_size: int = 2
                        ):
         assert level.upper() in ["COHORT", "SLIDE", "ROI"], "Only 'cohort', 'slide' and 'roi' are accetable values for level"
         this_pheno = self.phenograph[key_pheno]
@@ -1535,15 +1547,17 @@ class CytofCohort():
                 fig, axs = plt.subplots(1,ncol, figsize=(ncol*fig_width, fig_width))
             proj_2d = proj_2ds[key]
             commu = commus[key]
+
             # Visualize 1: plot 2d projection together
             print("Visualization in 2d - {}-{}".format(level, key))
             savename = os.path.join(vis_savedir, f"cluster_scatter_{level}_{key}.png") if (save_vis and not plot_together) else None
             ax = axs[0] if plot_together else None
             fig_scatter, ax_scatter = visualize_scatter(data=proj_2d, communities=commu, n_community=n_community, 
-                                            title=key, savename=savename, show=show_plots, ax=ax)
+                                            title=key, scatter_dot_size=scatter_dot_size, savename=savename, show=show_plots, ax=ax)
             figs_scatter[key] = (fig_scatter, ax_scatter)
             
             figs_exps[key]    = {}
+
             # Visualize 2: protein expression
             for axid, acm_tpe in enumerate(accumul_type):
                 ids = [i for (i, x) in enumerate(feat_names) if re.search(".{}".format(acm_tpe), x)]
@@ -1942,3 +1956,38 @@ class CytofCohort():
             slide_co_expression_dict[slide_key] = (edge_percentage_norm, df_expected.columns)
 
         return slide_co_expression_dict
+
+
+    def cohort_interaction_graphs(self, feature_name, accumul_type, method: str = "distance", threshold=50):
+        assert method in ["distance", "k-neighbor"], "Method can be either 'distance' or 'k-neighbor'!"
+        
+        # used to store ROI-level interaction graphs
+        marker_roi_list = list()
+
+        for roi_keys, cytof_img in self.cytof_images.items():
+            print(f"Processing ROI {roi_keys}")
+            df_expected_prob, df_cell_interaction_prob = cytof_img.roi_interaction_graphs(feature_name=feature_name, accumul_type=accumul_type, method=method, threshold=threshold, return_components=False)
+
+            # do some post processing
+            marker_all = df_expected_prob.columns
+            epsilon = 1e-6
+
+            # Normalize and fix Nan
+            edge_percentage_norm = np.log10(df_cell_interaction_prob.values / (df_expected_prob.values+epsilon) + epsilon)
+
+            # if observed/expected = 0, then log odds ratio will have log10(epsilon)
+            # no observed means interaction cannot be determined, does not mean strong negative interaction
+            edge_percentage_norm[edge_percentage_norm == np.log10(epsilon)] = 0
+
+            edge_perc_remapped = pd.DataFrame(edge_percentage_norm, index=marker_all, columns=marker_all)
+            edge_perc_remapped["roi_id"] = roi_keys
+            marker_roi_list.append(edge_perc_remapped)
+
+        # concatenate all pt df
+        edge_percentage_cohort = pd.concat(marker_roi_list, axis=0)
+        edge_percentage_cohort = edge_percentage_cohort.reset_index(names='marker')
+
+        # cohort specific: 0 was used to indicate not observed, but average over will skew the df
+        edge_percentage_cohort = edge_percentage_cohort.replace(0, np.nan)
+
+        return edge_percentage_cohort, marker_all

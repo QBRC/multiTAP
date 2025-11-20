@@ -358,7 +358,7 @@ def check_feature_distribution(feature_summary_df, features):
 #         return None
 #     return fig
 
-def visualize_scatter(data, communities, n_community, title, figsize=(5,5), savename=None, show=False, ax=None):
+def visualize_scatter(data, communities, n_community, title, scatter_dot_size, figsize=(5,5), savename=None, show=False, ax=None):
     """
     data = data to visualize (N, 2)
     communities = group indices correspond to each sample in data (N, 1) or (N, )
@@ -372,10 +372,15 @@ def visualize_scatter(data, communities, n_community, title, figsize=(5,5), save
     else:
         fig = None
     ax.set_title(title)
-    sns.scatterplot(x=data[:,0], y=data[:,1], hue=communities, palette='tab20',
-                    hue_order=np.arange(n_community), ax=ax)
-                    #                 legend=legend,
-                    # hue_order=np.arange(n_community))
+    sns.scatterplot(x=data[:,0], 
+                    y=data[:,1], 
+                    hue=communities, 
+                    palette='tab20', 
+                    s=scatter_dot_size, 
+                    alpha=0.9, 
+                    linewidth=0,
+                    hue_order=np.arange(n_community), ax=ax
+                    )
     
     ax.legend(bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0.)
     # plt.axis('tight')

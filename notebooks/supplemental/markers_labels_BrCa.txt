@@ -1,0 +1,20 @@
+labels: ['Ar80', 'Ru96', 'Ru98', 'Ru99', 'Ru100', 'Ru101', 'Ru102', 'Ru104',
+       'In113', 'nan1', 'nan2', 'La139', 'Pr141', 'Nd142', 'Nd143', 'Nd144',
+       'Nd145', 'Nd146', 'Sm147', 'Nd148', 'Sm149', 'Nd150', 'Eu151',
+       'Sm152', 'Eu153', 'Sm154', 'Gd155', 'Gd156', 'Gd158', 'Tb159',
+       'Gd160', 'Dy161', 'Dy162', 'Dy163', 'Dy164', 'Ho165', 'Er166',
+       'Er167', 'Er168', 'Tm169', 'Er170', 'Yb171', 'Yb172', 'Yb173',
+       'Yb174', 'Lu175', 'Yb176', 'Ir191', 'Ir193', 'nan3', 'nan4', 'nan5']
+        
+markers: ['ArgonDimers', 'RutheniumTetroxide', 'RutheniumTetroxide',
+       'RutheniumTetroxide', 'RutheniumTetroxide', 'RutheniumTetroxide',
+       'RutheniumTetroxide', 'RutheniumTetroxide', 'Histone H3', 'nan1', 'nan2',
+       'Histone H3', 'Cytokeratin 5', 'Fibronectin', 'Cytokeratin 19',
+       'Cytokeratin 8or18', 'Twist', 'CD68', 'Keratin 14 (KRT14)', 'SMA',
+       'Vimentin', 'c-Myc', 'c-erbB-2 - Her2', 'CD3', 'Histone H3',
+       'Erk1or2', 'Slug', 'Rabbit IgG H L', 'Progesterone Receptor AorB',
+       'p53', 'CD44', 'EpCAM', 'CD45', 'GATA3', 'CD20', 'b-Catenin',
+       'Carbonic Anhydrase IX', 'undefined', 'Ki-67', 'EGFR', 'S6',
+       'Sox9', 'vWF-CD31', 'mTOR', 'Cytokeratin 7',
+       'pan Cytokeratin-Keratin Epithelial',
+       'cleaved PARP-Cleaved Caspase3', 'DNA1', 'DNA2', 'nan3', 'nan4', 'nan5']
