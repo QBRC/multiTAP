@@ -1,5 +1,5 @@
 # Required parameters
-filename: /archive/DPDS/Xiao_lab/shared/shidan/hyperion/The Single-Cell Pathology Landscape of Breast Cancer/OMEandSingleCellMasks/OMEnMasks/ome/ome/BaselTMA_SP43_25.8kx22ky_10500x6500_8_20170928_114_115_X4Y8_262_a0_full.tiff # full file path of the input CyTOF image, required
+filename: /path/to/your/BaselTMA_SP43_25.8kx22ky_10500x6500_8_20170928_114_115_X4Y8_262_a0_full.tiff # full file path of the input CyTOF image, required
 outdir: ./test_out # output saving directory, required
 channels_dict: # a dictionary that defines special channels "nuclei", "membrane" (optional)
   nuclei: ['DNA1-Ir191', 'DNA2-Ir193']    # dictionary key "nuclei" required
@@ -8,7 +8,7 @@ channels_dict: # a dictionary that defines special channels "nuclei", "membrane"
   membrane: ['Vimentin-Sm149', 'c-erbB-2 - Her2-Eu151', 'pan Cytokeratin-Keratin Epithelial-Lu175', 'CD44-Gd160','Fibronectin-Nd142']  
 
 # Optional parameters
-label_marker_file: /archive/DPDS/Xiao_lab/shared/hudanyun_sheng/github/image_cytof_test_data/external_data/The Single-Cell Pathology Landscape of Breast Cancer/markers_labels.txt # full file path of the label-marker file, optional
+label_marker_file: ./notebooks/supplemental/markers_labels_BrCa.txt # full file path of the label-marker file, optional
 slide: BaselTMA_SP43_25.8kx22ky # slide ID, optional, default="slide1"
 roi: 114_115_X4Y8_262 # roi ID", optional, default="roi1"
 quality_control_thres: 50 # threshold for quality control, optional, default=50

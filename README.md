@@ -21,7 +21,7 @@ The links above should open to the following analysis page:
 In this tutorial, we will utilize a publicly available breast cancer dataset containing 352 patients sourced from University Hospital Basel and University Hospital Zurich (original paper [here](https://pubmed.ncbi.nlm.nih.gov/31959985/)).
 
 > [!NOTE]  
-> ROI `BaselTMA_SP43_25.8kx22ky_10500x6500_8_20170928_114_115_X4Y8_262_a0_full` is used. For convenience, you may download this ROI at https://qbrc.swmed.edu/labs/xiaoxie/download/multiplex/example_image.tiff
+> The following quick start guide uses ROI `BaselTMA_SP43_25.8kx22ky_10500x6500_8_20170928_114_115_X4Y8_262_a0_full`. For convenience, you may download this ROI at https://qbrc.swmed.edu/labs/xiaoxie/download/multiplex/example_image.tiff
 
 TIFF files contain Regions of Interest (ROIs) stored as multiplexed images. Since marker information is not available from the provided TIFF alone, we need an additional `Marker File` with lists of channels to identify the antibodies.
 
@@ -98,7 +98,8 @@ To visualize the separated cell population, we used UMAP to project the high-dim
 
 <img src="doc_img/public-step7.png">
 
-Note: Given the random initialization of the clusterings and dimensionality reduction, you might get slightly different results even though both of our algorithms are set with a random seed.
+> [!NOTE]
+> Given the random initialization of the clusterings and dimensionality reduction, you might get slightly different results even though both of our algorithms are set with a random seed.
 
 In additional, you could visualizing the cluster assignments against the positive markers to oberve any patterns: <img src="doc_img/public-step7b.png">
 
@@ -131,23 +132,21 @@ We also provide notebook tutorials to faciliate any modifications to the analysi
 - Then, reference the following notebooks in accordance to your analysis goal:
    - Analyzing single ROIs saved as TIFF files:
       refer to <a href="notebooks/tutorial-Single-ROI-tiff.ipynb">this jupyter notebook</a>.
-   - Analyzing single ROIs saved as TXT files: 
-      refer to <a href="notebooks/tutorial-Single-ROI-txt.ipynb">this jupyter notebook</a>.
 
    - Analyzing multiple ROIs contained in MCD files:
-      refer to <a href="notebooks/tutorial-Single-Slide-mcd.ipynb">this jupyter notebook</a>.
+      refer to <a href="notebooks/tutorial-MCD-explore.ipynb">this jupyter notebook</a>.
    - Preprocess `.qptiff` high dimensional spatial imaging files and save as TIFF files:
-      refer to <a href="notebooks/qptiff-preprocess.ipynb">this jupyter notebook</a>.   
+      refer to <a href="notebooks/tutorial-QPTIFF-explore.ipynb">this jupyter notebook</a>.   
 
 
 # Command line interface usage
 Given the complexity of the parameters used in the command line, we recommend consolidate all params into one file with YAML format. You can find example YAML files in `example_data`.
 
 ## Single ROI
-To process an ROI of the multiplexed images stored in either TXT or TIFF, you can call the following scripts (notice the different parameters settings for TIFF vs. TXT):
+To process an ROI of the multiplexed images stored in TIFF, you can call the following scripts:
 ```
 cd .CLIscripts/
-python  process_single_roi.py /path/to/your/yaml
+python  process_single_roi.py templates/singleROI_tiff.yaml
 ```
 
 Parameter options summary:
@@ -155,7 +154,7 @@ Parameter options summary:
    ---------------------------------------- | ------------- | -------------
    (required)
    --filename  |  full file path of the input CyTOF image
-   --out_dir | output saving directory
+   --outdir | output saving directory
    --channels_dict | a dictionary that defines special channels (nuclei and/or membrane)
    (optional)
    --label_marker_file | full file path of the label-marker file
@@ -168,15 +167,7 @@ Parameter options summary:
    --normalize_qs |  a list percentile to be used in normalization | [75, 99]
 
 ## Multiple ROI/TMA
-If you know there exist multiple ROI within the same slide, or in the case of this breast cancer dataset where TMAs can be grouped by grade, clinical type, pTNM, you can batch process all of these ROI/TMAs at once. Checkout `./CLIscipts/batch_process_feature.py` for implementation details.
-
-To run batch process, you may call the following scripts:
-```
-sh batch_feature_extract.sh
-```
-Note: The IMC data and folder structure has to be maintained from the original published format. See the official data repo on https://zenodo.org/records/4607374
-
-After batch processing ROIs into one cohort, you may perform downstream analysis such as co-expression at the cohort level. See `./CLIscipts/cohort_coexpression.py` for implementation details.
+If you know there exist multiple ROI within the same slide, or in the case of where TMAs can be grouped by grade, clinical type, pTNM, you can batch process all of these ROI/TMAs at once. An end-to-end workflow README for a non-small cell lung cancer IMC dataset is provided in `nsclc_tutorial/README.md`.
 
 # Resources
-More details on the IMC technology can be found here ([external website)](https://visikol.com/imaging-mass-cytometry-services/?utm_term=hyperion%20imc&utm_source=adwords&utm_medium=ppc&utm_campaign=In+Vitro&hsa_src=g&hsa_kw=hyperion%20imc&hsa_mt=p&hsa_net=adwords&hsa_ver=3&hsa_ad=466715899865&hsa_tgt=kwd-958710387481&hsa_acc=4440962479&hsa_cam=11171160177&hsa_grp=109898052392&gclid=Cj0KCQiAw8OeBhCeARIsAGxWtUz8EEluaugz04nXZuagPi8EvYwd_9FSe_tFy_fW7mEalerXZS2MRSkaAlRQEALw_wcB).
+More details on the IMC technology can be found here ([external website])(https://visikol.com/imaging-mass-cytometry-services/?utm_term=hyperion%20imc&utm_source=adwords&utm_medium=ppc&utm_campaign=In+Vitro&hsa_src=g&hsa_kw=hyperion%20imc&hsa_mt=p&hsa_net=adwords&hsa_ver=3&hsa_ad=466715899865&hsa_tgt=kwd-958710387481&hsa_acc=4440962479&hsa_cam=11171160177&hsa_grp=109898052392&gclid=Cj0KCQiAw8OeBhCeARIsAGxWtUz8EEluaugz04nXZuagPi8EvYwd_9FSe_tFy_fW7mEalerXZS2MRSkaAlRQEALw_wcB).

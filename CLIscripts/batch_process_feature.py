@@ -54,7 +54,7 @@ class SetParameters():
 ##### reading csv in manually#####
 # see example format in `example_data`
 # helper function to generate `test_cohort.csv` below and in `tutorial-MCD-explore.ipynb`
-filename = 'ROOT_DIR/multiTap/example_data/test_cohort.csv'
+filename = 'ROOT_DIR/multiTAP/CLIscripts/tempaltes/example_cohort.csv'
 df_nsclc_all = pd.read_csv(filename)
 ##################################
 
@@ -76,7 +76,7 @@ df_nsclc_all = pd.read_csv(filename)
 # # Third input is the corresponding file path
 # # df is required to have three keys for downstream analysis: 'Slide', 'ROI', 'input file'
 # df_cohort_to_load = pd.DataFrame({"Slide": slides, "ROI": roi_name, "input file": fs_input}) 
-# df_cohort_to_load.to_csv('test_cohort.csv', index=False)
+# df_cohort_to_load.to_csv('example_cohort.csv', index=False)
 ####################################################
 
 ##### NSCLC Basel configs ##########################
