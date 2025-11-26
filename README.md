@@ -28,7 +28,7 @@ TIFF files contain Regions of Interest (ROIs) stored as multiplexed images. Sinc
 The `Marker File` for this dataset is  prepared and available in 
 
 ```
-example_data/markers_labels.txt
+notebooks/supplemental/markers_labels_BrCa.txt
 ```
 
 After loading the two files to the GUI, you would be able to read individual marker names and visualize the channels:
