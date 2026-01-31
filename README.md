@@ -28,7 +28,7 @@ TIFF files contain Regions of Interest (ROIs) stored as multiplexed images. Sinc
 The `Marker File` for this dataset is  prepared and available in 
 
 ```
-example_data/markers_labels.txt
+notebooks/supplemental/markers_labels_BrCa.txt
 ```
 
 After loading the two files to the GUI, you would be able to read individual marker names and visualize the channels:
@@ -84,7 +84,9 @@ Example output from this ROI: <img src="doc_img/public-step4.png">
 
 *Spatial interactoin analysis* measures the degree of co-expression within a pair of neighborhoods. A neighbor is defined as any pair of cells that passes the threshold, which is defined either as the Euclidean distance from each cell or as the number of surrounding cells to be included in the weighted graph of k-neighbors. You will have the option to choose which in the GUI.
 
-For this ROI, you should get the expression matrix similar to the following: <img src="doc_img/public-step5.png">
+For this ROI, you should get the expression matrix similar to the following: <img src="doc_img/public-step5a.png">
+
+ <img src="doc_img/public-step5b.png">
 
 With the co-expression and interaction matrix, you can now visualize positive states in cells via a side-by-side comparison. This serves two purposes. 1) Validate the co-expression analysis results. High expression level should mean a similar number of positive markers within the two slides, whereas low expression level mean a large difference of in the number of positive markers. 2) Validate the spatial interaction analysis results. High interaction means the two positive markers are in close proximity of each other (proximity is previously defined in `clustering threshold`), and vice versa.
 
@@ -96,12 +98,13 @@ PhenoGraph is an algorithm capable of separating cell populations within complex
 
 To visualize the separated cell population, we used UMAP to project the high-dimensional data onto a 2-D space. The previously assigned clusters are also reflected in this figure. An example result for this ROI:
 
-<img src="doc_img/public-step7.png">
+<img src="doc_img/public-step7a.png">
+<img src="doc_img/public-step7b.png">
 
 > [!NOTE]
 > Given the random initialization of the clusterings and dimensionality reduction, you might get slightly different results even though both of our algorithms are set with a random seed.
 
-In additional, you could visualizing the cluster assignments against the positive markers to oberve any patterns: <img src="doc_img/public-step7b.png">
+In additional, you could visualizing the cluster assignments against the positive markers to oberve any patterns: <img src="doc_img/public-step7c.png">
 
 
 # Install from Github
