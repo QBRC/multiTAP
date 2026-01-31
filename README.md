@@ -98,12 +98,13 @@ PhenoGraph is an algorithm capable of separating cell populations within complex
 
 To visualize the separated cell population, we used UMAP to project the high-dimensional data onto a 2-D space. The previously assigned clusters are also reflected in this figure. An example result for this ROI:
 
-<img src="doc_img/public-step7.png">
+<img src="doc_img/public-step7a.png">
+<img src="doc_img/public-step7b.png">
 
 > [!NOTE]
 > Given the random initialization of the clusterings and dimensionality reduction, you might get slightly different results even though both of our algorithms are set with a random seed.
 
-In additional, you could visualizing the cluster assignments against the positive markers to oberve any patterns: <img src="doc_img/public-step7b.png">
+In additional, you could visualizing the cluster assignments against the positive markers to oberve any patterns: <img src="doc_img/public-step7c.png">
 
 
 # Install from Github
