@@ -1,7 +1,9 @@
 ![QBRC logo](doc_img/qbrc.jpeg)
 
 # Introduction
-**Multi**plexed **T**issue **A**nalysis **P**latform (MultiTAP) is an open-source Python package designed for analyzing multiplexed tissue images. Package functionalities include the quantification of single-cell biomarkers, cell type clustering, and the analysis of cell-cell interactions. MultiTAP addresses a critical gap between the existing software landscape and the exponentially increasing volume of multiplexed tissue image data, by providing comprehensive and user-friendly tools tailored specifically for analyzing multiplexed data representations. Compared with previous software, MultiTAP offers unique features and advantages. It incorporates a cell segmentation algorithm guided by cytoplasm membrane labels, provides downstream analysis methods such as data normalization and automatic identification of marker-positive cells, and enables co-expression and cell-cell spatial interaction analysis. Moreover, MultiTAP offers the convenience of end-to-end analysis with a GUI for users from diverse backgrounds. 
+**Multi**plexed **T**issue **A**nalysis **P**latform (MultiTAP) is an open-source Python package designed to analyze high-dimensional tissues at scale. This framework integrates cell segmentation, biomarker quantification, phenotyping, and spatial analysis. Designed for IMC data, we show that MultiTAP is easily extendable to other modalities such as multiplexed IHC assays. We benchmark its segmentation performance against state-of-the-art methods on an IMC dataset and characterize the spatial and co-localization patterns of epithelial cells in breast carcinomas. Finally, we demonstrate the broad applicability of MultiTAP by applying the framework to a large non-small cell lung cancer (NSCLC) cohort, where the platform identifies cancer-associated fibroblast (CAF) interactions with prognostic relevance.
+
+MultiTAP is available as a HuggingFace :hugs: Space, by Jupyter Notebook, and by command line.
 
 A workflow of MultiTAP is shown here: <img src="doc_img/workflow.png" alt="workflow">
 
