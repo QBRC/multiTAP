@@ -77,7 +77,7 @@ print(np.sum(tcf7_cd8_index), "TCF1/7 CD8 identified")
 
 # assign PD-1 subsets
 pd1_marker = f"CD279(P_1743((3414))Gd155-Gd155_{cell_suffix}"
-pd1_cd4_index = non_tumor_cleaned[cd3_marker] & non_tumor_cleaned[cd8_marker] & non_tumor_cleaned[pd1_marker] & (non_tumor_cleaned['final_cell_type'].isna())
+pd1_cd4_index = non_tumor_cleaned[cd3_marker] & non_tumor_cleaned[cd4_marker] & non_tumor_cleaned[pd1_marker] & (non_tumor_cleaned['final_cell_type'].isna())
 non_tumor_cleaned.loc[pd1_cd4_index, "final_cell_type"] = "PD1 CD4"
 print(np.sum(pd1_cd4_index), "PD1 CD4 identified")
 
@@ -154,24 +154,23 @@ icaf_index = non_tumor_cleaned[cd34_marker] & non_tumor_cleaned[cd248_marker] & 
 non_tumor_cleaned.loc[icaf_index, "final_cell_type"] = "iCAF"
 print(np.sum(icaf_index), "iCAF identified")
 
-# tCAF
+# hypoxic tCAF
 cd10_marker = f"CD10_2546((3029))Dy161-Dy161_{cell_suffix}"
 cd73_marker = f"CD73_2193((3319))Gd156-Gd156_{cell_suffix}"
+caix_marker = f"Carboni_2443((2757))Nd146-Nd146_{cell_suffix}"
+hypoxic_tcaf_index = non_tumor_cleaned[cd10_marker] & non_tumor_cleaned[caix_marker] & (non_tumor_cleaned['final_cell_type'].isna())
+non_tumor_cleaned.loc[hypoxic_tcaf_index, "final_cell_type"] = "hypoxic tCAF"
+print(np.sum(hypoxic_tcaf_index), "hypoxic tCAF identified")
+
+# tCAF
 tcaf_index = non_tumor_cleaned[cd10_marker] & non_tumor_cleaned[cd73_marker] & (non_tumor_cleaned['final_cell_type'].isna())
 non_tumor_cleaned.loc[tcaf_index, "final_cell_type"] = "tCAF"
 print(np.sum(tcaf_index), "tCAF identified")
 
 # hypoxic CAF
-caix_marker = f"Carboni_2443((2757))Nd146-Nd146_{cell_suffix}"
-hypoxic_caf_index = non_tumor_cells[caix_marker] & (non_tumor_cleaned['final_cell_type'].isna())
+hypoxic_caf_index = non_tumor_cleaned[caix_marker] & (non_tumor_cleaned['final_cell_type'].isna())
 non_tumor_cleaned.loc[hypoxic_caf_index, "final_cell_type"] = "hypoxic CAF"
 print(np.sum(hypoxic_caf_index), "hypoxic CAF identified")
-
-# hypoxic tCAF
-# reassign classified hypoxic CAF to hypoxic tCAF if CD10+
-hypoxic_tcaf_index = non_tumor_cells[cd10_marker] & hypoxic_caf_index
-non_tumor_cleaned.loc[hypoxic_tcaf_index, "final_cell_type"] = "hypoxic tCAF"
-print(np.sum(hypoxic_tcaf_index), "hypoxic tCAF identified")
 
 #ifnCAF
 ifn_caf_index = non_tumor_cells[ido_marker] & (non_tumor_cleaned['final_cell_type'].isna())
@@ -207,7 +206,7 @@ print(np.sum(collagen_caf_index), "Collagen CAF identified")
 
 # subset needed columns
 nontumor_pairwise_survival = non_tumor_cleaned[["pt_id", "roi_id", "coordinate_x", "coordinate_y", "final_cell_type"]].copy()
-save_path = os.path.join(BASE_CSV_DIR, f"nontumor_cell_subtypes_accuml_{accuml_type}test.csv")
+save_path = os.path.join(BASE_CSV_DIR, f"nontumor_cell_subtypes_accuml_{accuml_type}.csv")
 nontumor_pairwise_survival.to_csv(save_path, index=False)
 
 print("Cell_subtypes saved to", save_path)
