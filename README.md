@@ -115,7 +115,7 @@ You can check out and install them through ``requirements.txt`` as below.
 
 <ol>
 <li>Clone this repo:</li>
-   <pre> $ git clone git@github.com:QBRC/image_cytof.git</pre>
+   <pre> $ git clone git@github.com:QBRC/multiTAP.git</pre>
 <li>Install (or confirm installation of) Anaconda.</li>
 <li>Install the virtual environment</li>
       <pre> $ conda env create -f environment.yml</pre>
